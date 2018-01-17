@@ -78,4 +78,4 @@ theme: landscape
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
   type: git
-  repo: https://github.com/DanielJyc/techBlog.github.io.git
+  repo: https://github.com/TechnologyBlog/blog.github.io
