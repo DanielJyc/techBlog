@@ -1,9 +1,14 @@
+---
+title: storm学习
+date: 2018-01-17 20:40:00
+tags:
+---
 # storm学习
 # 原理和实例部分
 ## 流式框架对比
 Hadoop只能处理适合进行批量计算的需求；Storm用来解决分布式流式计算系统。除此之外，流计算还有spark streaming和flink。对比：
 
-![-w389](media/15152262382414/15152288920269.jpg)
+![-w389](/images/15152262382414/15152288920269.jpg)
 
 - 如果你想要的是一个允许增量计算的高速事件处理系统，Storm会是最佳选择。
 - 如果你必须有状态的计算，恰好一次的递送，并且不介意高延迟的话，那么可以考虑Spark Streaming，特别如果你还计划图形操作、机器学习或者访问SQL的话，Apache Spark的stack允许你将一些library与数据流相结合(Spark SQL，Mllib，GraphX)，它们会提供便捷的一体化编程模型。尤其是数据流算法(例如：K均值流媒体)允许Spark实时决策的促进。
@@ -20,11 +25,11 @@ Storm采用的是Master-Slave结构，就是使用一个节点来管理整个集
 - 普通计算节点Bolt：负责转换这些数据流，在bolt中可以完成计算、过滤等操作，bolt自身也可以随机将数据发送给其他bolt。
 - 记录Tuples：由spout发射出的tuple是不可变数组，对应着固定的键值对。
 - tuple：storm使用tuple来作为它的数据模型。每个tuple是一堆值，每个值有一个名字，并且每个值可以是任何类型。Tuple本来应该是一个Key-Value的Map，由于各个组件间传递的tuple的字段名称已经事先定义好了，所以Tuple只需要按序填入各个Value，所以就是一个Value List。一个Tuple代表数据流中的一个基本的处理单元，例如一条cookie日志，它可以包含多个Field，每个Field表示一个属性。
-![](media/15152262382414/15153820369981.jpg)
+![](/images/15152262382414/15153820369981.jpg)
 
 - Stream：一个没有边界的、源源不断的、连续的Tuple序列就组成了Stream。
 
-![](media/15152262382414/15152291458332.jpg)
+![](/images/15152262382414/15152291458332.jpg)
 
 ## 一个简单的Topology
 看一下storm-starter里面的ExclamationTopology:
@@ -119,7 +124,7 @@ Conf对象可以配置很多东西， 下面两个是最常见的：
 ## Topology的三个组件
 运行中的Topology主要由以下三个组件组成的：Worker processes（进程）、Executors (threads)（线程）、Tasks。
 
-![-w400](media/15152262382414/15153930533601.jpg)
+![-w400](/images/15152262382414/15153930533601.jpg)
 
 
 举例：
@@ -136,12 +141,12 @@ builder.setBolt("yellow-bolt",new ExclamationBolt(),6).shuffleGrouping("green-bo
 ```
 对应的Worker processes（进程）、Executors (threads)（线程）、Tasks数量。指定了2个Worker。共2+2+6=10个Executor线程，每个Worker5个（图中未画出来）。绿色指定了Task数量为4，蓝色和黄色没有指定。
 
-![-w600](media/15152262382414/15153932587430.jpg)
+![-w600](/images/15152262382414/15153932587430.jpg)
 
 ## 流分组策略(Stream grouping)
 流分组策略告诉topology如何在两个组件之间发送tuple。spouts和bolts以很多task的形式在topology里面同步执行。如果从task的粒度来看一个运行的topology，它应该是这样的:
 
-![-w502](media/15152262382414/15153941313422.jpg)
+![-w502](/images/15152262382414/15153941313422.jpg)
 
 当Bolt A的一个task要发送一个tuple给Bolt B， 它应该发送给Bolt B的哪个task呢？下面是一些常用的 “路由选择” 机制：
 
@@ -158,7 +163,7 @@ Bolt可以使用任何语言来定义。用其它语言定义的bolt会被当作
 ## 可靠的消息处理
 Storm允许用户在Spout中发射一个新的源Tuple时为其指定一个MessageId，这个MessageId可以是任意的Object对象。多个源Tuple可以共用同一个MessageId，表示这多个源Tuple对用户来说是同一个消息单元。Storm的可靠性是指Storm会告知用户，每一个消息单元是否在一个指定的时间内被完全处理。完全处理的意思是该MessageId绑定的源Tuple以及由该源Tuple衍生的所有Tuple，都经过了Topology中每一个应该到达的Bolt的处理。
 
-![](media/15152262382414/15153960805842.jpg)
+![](/images/15152262382414/15153960805842.jpg)
 
 在Spout中由`message 1`绑定的tuple1和tuple2分别经过bolt1和bolt2的处理，然后生成了两个新的Tuple，并最终流向了bolt3。当bolt3处理完之后，称message 1被完全处理了。
 
@@ -168,14 +173,14 @@ Storm中的每一个Topology中都包含有一个Acker组件。Acker组件的任
 ## IComponent接口
 Spout和Bolt都是其Component。所以，Storm定义了一个名叫IComponent的总接口。IComponent的继承关系如下图所示：
 
-![](media/15153963579254/15153981288478.jpg)
+![](/images/15153963579254/15153981288478.jpg)
 
 绿色部分是我们最常用、比较简单的部分。红色部分是与事务相关。BaseComponent是Storm提供的“偷懒”的类。为什么这么说呢，它及其子类，都或多或少实现了其接口定义的部分方法。这样我们在用的时候，可以直接继承该类，而不是自己每次都写所有的方法。但值得一提的是，BaseXXX这种定义的类，它所实现的方法，都是空的，直接返回null。
 
 ## Spout
-![-w535](media/15153963579254/15153981837831.jpg)
+![-w535](/images/15153963579254/15153981837831.jpg)
 
-![](media/15153963579254/15153981996980.jpg)
+![](/images/15153963579254/15153981996980.jpg)
 
 各个接口说明：
 
@@ -193,10 +198,10 @@ Spout和Bolt都是其Component。所以，Storm定义了一个名叫IComponent�
 ## Bolt
 类图如下图所示：
 
-![-w577](media/15153963579254/15153983422720.jpg)
+![-w577](/images/15153963579254/15153983422720.jpg)
 
 
-![](media/15153963579254/15153983724519.jpg)
+![](/images/15153963579254/15153983724519.jpg)
 
 - prepare方法：IBolt继承了java.io.Serializable，我们在nimbus上提交了topology以后，创建出来的bolt会序列化后发送到具体执行的worker上去。worker在执行该Bolt时，会先调用prepare方法传入当前执行的上下文。
 - execute方法：接受一个tuple进行处理，并用prepare方法传入的OutputCollector的ack方法（表示成功）或fail（表示失败）来反馈处理结果。

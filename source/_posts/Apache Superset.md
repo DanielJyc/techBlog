@@ -1,3 +1,8 @@
+---
+title: Apache Superset
+date: 2018-01-17 20:41:00
+tags:
+---
 # Apache Superset
 Superset其实是一个自助式数据分析工具，它的主要目标是简化我们的数据探索分析操作。
 
