@@ -1,3 +1,8 @@
+---
+title: Apache Ambari
+date: 2018-01-17 20:41:00
+tags:
+---
 # Apache Ambari
 用来创建、管理、监视 Hadoop 的集群，但是这里的 Hadoop 是广义，指的是 Hadoop 整个生态圈（例如 Hive，Hbase，Sqoop，Zookeeper 等），而并不仅是特指 Hadoop。用一句话来说，Ambari 就是为了让 Hadoop 以及相关的大数据软件更容易使用的一个工具。
 
